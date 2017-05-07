@@ -80,15 +80,15 @@ var cmdLightsState = &cobra.Command{
 	Short: "Set light state: ghue lights state <idLight> [--param1=value], [--param2=value]...",
 	Long:  `Set light state: ghue lights state <idLight> [--param1=value], [--param2=value]...`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) != 1 {
+		if len(args) < 1 {
 			fmt.Fprintln(os.Stderr, "Invalid usage. Please see ./ghue lights state --help")
 		} else {
-			stateCmd(args[0])
+			stateCmd(args)
 		}
 	},
 }
 
-func stateCmd(id string) {
+func stateCmd(id []string) {
 	connection := config.ReadConfig()
 	setState := &lights.SetStateValues{
 		On:             on,
@@ -106,10 +106,13 @@ func stateCmd(id string) {
 		CtInc:          ctInc,
 		XYInc:          xyInc,
 	}
-	result, errHUE, err := lights.SetState(connection, id, setState)
-	internal.CheckErrors(err, errHUE)
 
-	jsonStr, err := json.MarshalIndent(result, "", "  ")
-	internal.Check(err)
-	internal.FormatOutputDef(jsonStr)
+	for _, light := range id {
+		result, errHUE, err := lights.SetState(connection, light, setState)
+		internal.CheckErrors(err, errHUE)
+
+		jsonStr, err := json.MarshalIndent(result, "", "  ")
+		internal.Check(err)
+		internal.FormatOutputDef(jsonStr)
+	}
 }
