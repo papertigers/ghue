@@ -107,6 +107,7 @@ func stateCmd(id []string) {
 		XYInc:          xyInc,
 	}
 
+	// Loop over id's and set state
 	for _, light := range id {
 		result, errHUE, err := lights.SetState(connection, light, setState)
 		internal.CheckErrors(err, errHUE)
